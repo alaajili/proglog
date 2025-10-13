@@ -32,7 +32,7 @@ func newgrpcServer(config *Config) (srv *grpcServer, err error) {
 }
 
 /* START: NewgrcpServer */
-func NewgrpcServer(config *Config) (*grpc.Server, error) {
+func NewGRPCServer(config *Config) (*grpc.Server, error) {
 	gsrv := grpc.NewServer()
 	srv, err := newgrpcServer(config)
 	if err != nil {
@@ -105,5 +105,3 @@ func (s *grpcServer) ConsumeStream(req *api.ConsumeRequest, stream api.Log_Consu
 }
 
 /* END: ProduceStream and ConsumeStream */
-
-

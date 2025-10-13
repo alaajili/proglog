@@ -10,5 +10,3 @@ compile:
 test:
 	@go test -race ./...
 	@echo "Tests passed"
-
-.PHONY: compile test
