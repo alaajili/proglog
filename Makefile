@@ -8,14 +8,28 @@ init:
 .PHONY: gencert
 gencert: init
 	@cfssl gencert -initca certs/ca-csr.json | cfssljson -bare ca
+
 	@cfssl gencert \
 		-ca=ca.pem \
 		-ca-key=ca-key.pem \
-		-config=${PWD}/certs/ca-config.json \
+		-config=certs/ca-config.json \
 		-profile=server \
 		certs/server-csr.json | cfssljson -bare server
+
+	@cfssl gencert \
+		-ca=ca.pem \
+		-ca-key=ca-key.pem \
+		-config=certs/ca-config.json \
+		-profile=client \
+		certs/client-csr.json | cfssljson -bare client
+
 	@mv *.pem *.csr ${CONFIG_PATH}
 	@echo "certs generated at ${CONFIG_PATH}"
+
+.PHONY: rmcert
+rmcert:
+	@rm -rf ${CONFIG_PATH}/*.pem ${CONFIG_PATH}/*.csr
+	@echo "certs removed from ${CONFIG_PATH}"
 
 .PHONY: test
 test:
