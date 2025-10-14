@@ -66,16 +66,16 @@ func setupTest(t *testing.T, fn func(*Config)) (
 	require.NoError(t, err)
 
 	go func() {
-		server.Serve(l)
+		_ = server.Serve(l)
 	}()
 
 	client = api.NewLogClient(cc)
 
 	return client, config, func() {
 		server.Stop()
-		l.Close()
-		cc.Close()
-		clog.Remove()
+		_ = l.Close()
+		_ = cc.Close()
+		_ = clog.Remove()
 	}
 }
 

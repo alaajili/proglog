@@ -22,7 +22,7 @@ func TestLog(t *testing.T) {
 		t.Run(scenario, func(t *testing.T) {
 			dir, err := os.MkdirTemp("", "store-test")
 			require.NoError(t, err)
-			defer os.RemoveAll(dir)
+			defer func() { _ = os.RemoveAll(dir) }()
 
 			c := Config{}
 			c.Segment.MaxStoreBytes = 32
