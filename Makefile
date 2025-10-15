@@ -6,7 +6,7 @@ init:
 	@echo "config path: ${CONFIG_PATH}"
 
 .PHONY: gencert
-gencert: init
+gencert: copycert
 	@cfssl gencert -initca certs/ca-csr.json | cfssljson -bare ca
 
 	@cfssl gencert \
@@ -46,6 +46,10 @@ $(CONFIG_PATH)/model.conf:
 
 $(CONFIG_PATH)/policy.csv:
 	@cp certs/policy.csv $(CONFIG_PATH)/policy.csv
+
+.PHONY: copycert
+copycert: init $(CONFIG_PATH)/model.conf $(CONFIG_PATH)/policy.csv
+	@echo "copied model.conf and policy.csv to ${CONFIG_PATH}"
 
 .PHONY: test
 test: $(CONFIG_PATH)/policy.csv $(CONFIG_PATH)/model.conf
