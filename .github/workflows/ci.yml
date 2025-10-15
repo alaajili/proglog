@@ -20,9 +20,18 @@ jobs:
       with:
         go-version: '1.25.1'
         cache: true
+    
+    - name: install make
+      run: sudo apt-get install make
 
     - name: Download dependencies
       run: go mod download
+    
+    - name: Install cfssl
+      run: go install github.com/cloudflare/cfssl/cmd/...@v1.6.5
+    
+    - name: generate certs
+      run: make gencert
 
     - name: Run tests
       run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
