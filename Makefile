@@ -15,13 +15,23 @@ gencert: init
 		-config=certs/ca-config.json \
 		-profile=server \
 		certs/server-csr.json | cfssljson -bare server
+	@echo "generated server certs"
 
 	@cfssl gencert \
 		-ca=ca.pem \
 		-ca-key=ca-key.pem \
 		-config=certs/ca-config.json \
 		-profile=client \
-		certs/client-csr.json | cfssljson -bare client
+		-cn="root" \
+		certs/client-csr.json | cfssljson -bare root-client
+	@cfssl gencert \
+		-ca=ca.pem \
+		-ca-key=ca-key.pem \
+		-config=certs/ca-config.json \
+		-profile=client \
+		-cn="nobody" \
+		certs/client-csr.json | cfssljson -bare nobody-client
+	@echo "generated clients certs"
 
 	@mv *.pem *.csr ${CONFIG_PATH}
 	@echo "certs generated at ${CONFIG_PATH}"
@@ -31,8 +41,14 @@ rmcert:
 	@rm -rf ${CONFIG_PATH}/*.pem ${CONFIG_PATH}/*.csr
 	@echo "certs removed from ${CONFIG_PATH}"
 
+$(CONFIG_PATH)/model.conf:
+	@cp certs/model.conf $(CONFIG_PATH)/model.conf
+
+$(CONFIG_PATH)/policy.csv:
+	@cp certs/policy.csv $(CONFIG_PATH)/policy.csv
+
 .PHONY: test
-test:
+test: $(CONFIG_PATH)/policy.csv $(CONFIG_PATH)/model.conf
 	@go test -race ./...
 	@echo "all tests passed"
 
