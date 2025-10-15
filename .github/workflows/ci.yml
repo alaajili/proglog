@@ -28,7 +28,7 @@ jobs:
       run: go mod download
     
     - name: Install cfssl
-      run: go install go install github.com/cloudflare/cfssl/cmd/...@v1.6.5
+      run: go install github.com/cloudflare/cfssl/cmd/...@v1.6.5
     
     - name: generate certs
       run: make gencert
