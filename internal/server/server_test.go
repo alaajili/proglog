@@ -117,9 +117,9 @@ func setupTest(t *testing.T, fn func(*Config)) (
 
 	return rootClient, nobodyClient, cfg, func() {
 		server.Stop()
-		rootConn.Close()
-		nobodyConn.Close()
-		l.Close()
+		_ = rootConn.Close()
+		_ = nobodyConn.Close()
+		_ = l.Close()
 	}
 }
 
