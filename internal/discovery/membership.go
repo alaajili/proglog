@@ -91,7 +91,10 @@ func (m *Membership) eventHandler() {
 }
 
 func (m *Membership) handleJoin(member serf.Member) {
-	if err := m.handler.Join(member.Addr.String(), member.Name); err != nil {
+	if err := m.handler.Join(
+		member.Name,
+		member.Tags["rpc_addr"],
+	); err != nil {
 		m.logError(err, "failed to join", member)
 	}
 }
