@@ -83,7 +83,7 @@ func (a *Agent) setupLogger() error {
 func (a *Agent) setupLog() error {
 	var err error
 	a.log, err = log.NewLog(
-		a.Config.DataDir,
+		a.DataDir,
 		log.Config{},
 	)
 	return err
@@ -91,8 +91,8 @@ func (a *Agent) setupLog() error {
 
 func (a *Agent) setupServer() error {
 	authoriazer := auth.New(
-		a.Config.ACLModelFile,
-		a.Config.ACLPolicyFile,
+		a.ACLModelFile,
+		a.ACLPolicyFile,
 	)
 	serverConfig := &server.Config{
 		CommitLog: a.log,
@@ -100,8 +100,8 @@ func (a *Agent) setupServer() error {
 	}
 
 	var opts []grpc.ServerOption
-	if a.Config.ServerTLSConfig != nil {
-		creds := credentials.NewTLS(a.Config.ServerTLSConfig)
+	if a.ServerTLSConfig != nil {
+		creds := credentials.NewTLS(a.ServerTLSConfig)
 		opts = append(opts, grpc.Creds(creds))
 	}
 	
@@ -129,14 +129,14 @@ func (a *Agent) setupServer() error {
 }
 
 func (a *Agent) setupMembership() error {
-	rcpAddr, err := a.Config.RPCAddr()
+	rcpAddr, err := a.RPCAddr()
 	if err != nil {
 		return err
 	}
 	var opts []grpc.DialOption
-	if a.Config.PeerTLSConfig != nil {
+	if a.PeerTLSConfig != nil {
 		opts = append(opts, grpc.WithTransportCredentials(
-			credentials.NewTLS(a.Config.PeerTLSConfig),
+			credentials.NewTLS(a.PeerTLSConfig),
 		))
 	}
 	conn, err := grpc.NewClient(rcpAddr, opts...)
@@ -150,10 +150,10 @@ func (a *Agent) setupMembership() error {
 		DialOptions: opts,
 	}
 	a.membership, err = discovery.New(a.replicator, discovery.Config{
-		NodeName:       a.Config.NodeName,
-		BindAddr:       a.Config.BindAddr,
+		NodeName:       a.NodeName,
+		BindAddr:       a.BindAddr,
 		Tags:           map[string]string{"rpc_addr": rcpAddr},
-		StartJoinAddrs: a.Config.StartJoinAddrs,
+		StartJoinAddrs: a.StartJoinAddrs,
 	})
 	return err
 }

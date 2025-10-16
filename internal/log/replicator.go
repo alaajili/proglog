@@ -46,7 +46,7 @@ func (r *Replicator) replicate(addr string, leave chan struct{}) {
 		r.logError(err, "failed to dial", addr)
 		return
 	}
-	defer cc.Close()
+	defer func() { _ = cc.Close() }()
 
 	client := api.NewLogClient(cc)
 

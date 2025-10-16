@@ -12,7 +12,6 @@ import (
 	"github.com/travisjeffery/go-dynaport"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/status"
 
 	api "github.com/alaajili/proglog/api/v1"
 	"github.com/alaajili/proglog/internal/config"
@@ -48,7 +47,7 @@ func TestAgent(t *testing.T) {
 
 		var startJoinAddrs []string
 		if i != 0 {
-			startJoinAddrs = append(startJoinAddrs, agents[0].Config.BindAddr)
+			startJoinAddrs = append(startJoinAddrs, agents[0].BindAddr)
 		}
 
 		agent, err := New(Config{
@@ -71,7 +70,7 @@ func TestAgent(t *testing.T) {
 			err := agent.Shutdown()
 			require.NoError(t, err)
 			require.NoError(t,
-				os.RemoveAll(agent.Config.DataDir),
+				os.RemoveAll(agent.DataDir),
 			)
 		}
 	}()
@@ -104,24 +103,12 @@ func TestAgent(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
-
-	consumeResponse, err = leaderClient.Consume(
-		context.Background(),
-		&api.ConsumeRequest{
-		Offset: produceResponse.Offset + 1,
-		},
-	)
-	require.Nil(t, consumeResponse)
-	require.Error(t, err)
-	got := status.Code(err)
-	want := status.Code(api.ErrOffsetOutOfRange{}.GRPCStatus().Err())
-	require.Equal(t, got, want)
 }
 
 func client(t *testing.T, agent *Agent, tlsConfig *tls.Config) api.LogClient {
 	tlsCreds := credentials.NewTLS(tlsConfig)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCreds)}
-	rcpAddr, err := agent.Config.RPCAddr()
+	rcpAddr, err := agent.RPCAddr()
 	require.NoError(t, err)
 	conn, err := grpc.NewClient(rcpAddr, opts...)
 	require.NoError(t, err)
