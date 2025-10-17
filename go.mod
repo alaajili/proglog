@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hashicorp/raft v1.7.3
+	github.com/hashicorp/raft-boltdb v0.0.0-20250926130943-f41fa5f23d89
 	github.com/hashicorp/serf v0.10.2
 	github.com/stretchr/testify v1.11.1
 	github.com/travisjeffery/go-dynaport v1.0.0
@@ -38,7 +39,6 @@ require (
 	github.com/hashicorp/go-sockaddr v1.0.5 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/memberlist v0.5.2 // indirect
-	github.com/hashicorp/raft-boltdb v0.0.0-20250926130943-f41fa5f23d89 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/miekg/dns v1.1.56 // indirect
