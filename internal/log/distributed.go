@@ -13,7 +13,7 @@ import (
 	api "github.com/alaajili/proglog/api/v1"
 	"google.golang.org/protobuf/proto"
 	"github.com/hashicorp/raft"
-	raftboltdb "github.com/hashicorp/raft-boltdb"
+	raftboltdb "github.com/hashicorp/raft-boltdb/v2"
 )
 
 type DistributedLog struct {

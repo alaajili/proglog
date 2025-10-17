@@ -1,4 +1,4 @@
-package agent
+package agent_test
 
 import (
 	"context"
@@ -12,12 +12,16 @@ import (
 	"github.com/travisjeffery/go-dynaport"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 
 	api "github.com/alaajili/proglog/api/v1"
+	"github.com/alaajili/proglog/internal/agent"
 	"github.com/alaajili/proglog/internal/config"
 )
 
 func TestAgent(t *testing.T) {
+	var agents []*agent.Agent
+
 	serverTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
 		CertFile:      config.ServerCertFile,
 		KeyFile:       config.ServerKeyFile,
@@ -26,7 +30,7 @@ func TestAgent(t *testing.T) {
 		ServerAddress: "127.0.0.1",
 	})
 	require.NoError(t, err)
-	
+
 	peerTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
 		CertFile:      config.RootClientCertFile,
 		KeyFile:       config.RootClientKeyFile,
@@ -36,8 +40,7 @@ func TestAgent(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	var agents []*Agent
-	for i := range 3 {
+	for i := 0; i < 3; i++ {
 		ports := dynaport.Get(2)
 		bindAddr := fmt.Sprintf("%s:%d", "127.0.0.1", ports[0])
 		rpcPort := ports[1]
@@ -47,11 +50,17 @@ func TestAgent(t *testing.T) {
 
 		var startJoinAddrs []string
 		if i != 0 {
-			startJoinAddrs = append(startJoinAddrs, agents[0].BindAddr)
+			startJoinAddrs = append(
+				startJoinAddrs,
+				agents[0].Config.BindAddr,
+			)
 		}
 
-		agent, err := New(Config{
-			NodeName:        fmt.Sprintf("%d", i),
+		agent, err := agent.New(agent.Config{
+			NodeName: fmt.Sprintf("%d", i),
+			// START: agent_config
+			Bootstrap: i == 0,
+			// END: agent_config
 			StartJoinAddrs:  startJoinAddrs,
 			BindAddr:        bindAddr,
 			RPCPort:         rpcPort,
@@ -67,26 +76,31 @@ func TestAgent(t *testing.T) {
 	}
 	defer func() {
 		for _, agent := range agents {
-			err := agent.Shutdown()
-			require.NoError(t, err)
+			_ = agent.Shutdown()
 			require.NoError(t,
-				os.RemoveAll(agent.DataDir),
+				os.RemoveAll(agent.Config.DataDir),
 			)
 		}
 	}()
+
+	// wait until agents have joined the cluster
 	time.Sleep(3 * time.Second)
 
 	leaderClient := client(t, agents[0], peerTLSConfig)
 	produceResponse, err := leaderClient.Produce(
 		context.Background(),
 		&api.ProduceRequest{
-			Record: &api.Record{Value: []byte("foo")},
+			Record: &api.Record{
+				Value: []byte("foo"),
+			},
 		},
 	)
 	require.NoError(t, err)
 	consumeResponse, err := leaderClient.Consume(
 		context.Background(),
-		&api.ConsumeRequest{Offset: produceResponse.Offset},
+		&api.ConsumeRequest{
+			Offset: produceResponse.Offset,
+		},
 	)
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
@@ -103,14 +117,28 @@ func TestAgent(t *testing.T) {
 	)
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
+
+	// START: test_replication
+	consumeResponse, err = leaderClient.Consume(
+		context.Background(),
+		&api.ConsumeRequest{
+			Offset: produceResponse.Offset + 1,
+		},
+	)
+	require.Nil(t, consumeResponse)
+	require.Error(t, err)
+	got := status.Code(err)
+	want := status.Code(api.ErrOffsetOutOfRange{}.GRPCStatus().Err())
+	require.Equal(t, got, want)
+	// END: test_replication
 }
 
-func client(t *testing.T, agent *Agent, tlsConfig *tls.Config) api.LogClient {
+func client(t *testing.T, agent *agent.Agent, tlsConfig *tls.Config) api.LogClient {
 	tlsCreds := credentials.NewTLS(tlsConfig)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCreds)}
-	rcpAddr, err := agent.RPCAddr()
+	rpcAddr, err := agent.Config.RPCAddr()
 	require.NoError(t, err)
-	conn, err := grpc.NewClient(rcpAddr, opts...)
+	conn, err := grpc.NewClient(rpcAddr, opts...)
 	require.NoError(t, err)
 	client := api.NewLogClient(conn)
 	return client
