@@ -83,7 +83,7 @@ func (r *Resolver) ResolveNow(resolver.ResolveNowOptions) {
 			),
 		})
 	}
-	r.clientConn.UpdateState(resolver.State{
+	_ = r.clientConn.UpdateState(resolver.State{
 		Addresses:		addrs,
 		ServiceConfig:	r.serviceConfig,
 	})

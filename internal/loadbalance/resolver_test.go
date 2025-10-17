@@ -38,7 +38,7 @@ func TestResolver(t *testing.T) {
 	}, grpc.Creds(serverCreds))
 	require.NoError(t, err)
 
-	go srv.Serve(l)
+	go func() { _ = srv.Serve(l) }()
 	// END: setup_test
 
 	// START: mid_test
