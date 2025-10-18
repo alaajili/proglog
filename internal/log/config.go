@@ -6,7 +6,7 @@ type Config struct {
 	Raft struct {
 		raft.Config
 		StreamLayer *StreamLayer
-		Bootstrap    bool
+		Bootstrap   bool
 	}
 	Segment struct {
 		MaxStoreBytes uint64

@@ -17,9 +17,9 @@ const (
 
 type store struct {
 	*os.File
-	mu		sync.Mutex
-	buf		*bufio.Writer
-	size	uint64
+	mu   sync.Mutex
+	buf  *bufio.Writer
+	size uint64
 }
 
 func newStore(f *os.File) (*store, error) {
@@ -29,7 +29,7 @@ func newStore(f *os.File) (*store, error) {
 	}
 
 	size := uint64(fi.Size())
-	
+
 	return &store{
 		File: f,
 		size: size,
@@ -50,7 +50,7 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	
+
 	w += lenWidth
 	s.size += uint64(w)
 	return uint64(w), pos, nil
@@ -59,7 +59,7 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 func (s *store) Read(pos uint64) ([]byte, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	if err := s.buf.Flush(); err != nil {
 		return nil, err
 	}
@@ -73,14 +73,14 @@ func (s *store) Read(pos uint64) ([]byte, error) {
 	if _, err := s.File.ReadAt(b, int64(pos+lenWidth)); err != nil {
 		return nil, err
 	}
-	
+
 	return b, nil
 }
 
 func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	if err := s.buf.Flush(); err != nil {
 		return 0, err
 	}
@@ -91,10 +91,10 @@ func (s *store) ReadAt(p []byte, off int64) (int, error) {
 func (s *store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	if err := s.buf.Flush(); err != nil {
 		return err
 	}
-	
+
 	return s.File.Close()
 }

@@ -10,15 +10,15 @@ import (
 )
 
 type Replicator struct {
-	DialOptions	[]grpc.DialOption
-	LocalServer	api.LogClient
+	DialOptions []grpc.DialOption
+	LocalServer api.LogClient
 
-	logger	*zap.Logger
+	logger *zap.Logger
 
-	mu		sync.Mutex
-	servers	map[string]chan struct{}
-	closed	bool
-	close	chan struct{}
+	mu      sync.Mutex
+	servers map[string]chan struct{}
+	closed  bool
+	close   chan struct{}
 }
 
 func (r *Replicator) Join(name, addr string) error {

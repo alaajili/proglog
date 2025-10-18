@@ -110,8 +110,6 @@ func TestAgent(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, consumeResponse.Record.Value, []byte("foo"))
 
-
-
 	followerClient := client(t, agents[1], peerTLSConfig)
 	consumeResponse, err = followerClient.Consume(
 		context.Background(),

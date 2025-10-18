@@ -1,4 +1,5 @@
 package log
+
 import (
 	"io"
 	"os"
@@ -14,7 +15,7 @@ func TestIndex(t *testing.T) {
 
 	c := Config{}
 	c.Segment.MaxIndexBytes = 1024
-	
+
 	idx, err := newIndex(f, c)
 	require.NoError(t, err)
 	_, _, err = idx.Read(-1)

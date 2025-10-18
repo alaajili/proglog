@@ -11,15 +11,15 @@ import (
 	"time"
 
 	api "github.com/alaajili/proglog/api/v1"
-	"google.golang.org/protobuf/proto"
 	"github.com/hashicorp/raft"
 	raftboltdb "github.com/hashicorp/raft-boltdb/v2"
+	"google.golang.org/protobuf/proto"
 )
 
 type DistributedLog struct {
-	config	Config
-	log		*Log
-	raft	*raft.Raft
+	config Config
+	log    *Log
+	raft   *raft.Raft
 }
 
 func NewDistributedLog(dataDir string, config Config) (*DistributedLog, error) {
@@ -139,8 +139,8 @@ func (l *DistributedLog) Append(record *api.Record) (uint64, error) {
 }
 
 func (l *DistributedLog) apply(reqType RequestType, req proto.Message) (
-interface{},
-error,
+	interface{},
+	error,
 ) {
 	var buf bytes.Buffer
 	_, err := buf.Write([]byte{byte(reqType)})
@@ -385,8 +385,8 @@ func (l *logStore) StoreLogs(records []*raft.Log) error {
 	for _, record := range records {
 		if _, err := l.Append(&api.Record{
 			Value: record.Data,
-			Term: record.Term,
-			Type: uint32(record.Type),
+			Term:  record.Term,
+			Type:  uint32(record.Type),
 		}); err != nil {
 			return err
 		}
@@ -400,14 +400,13 @@ func (l *logStore) DeleteRange(min, max uint64) error {
 
 /* End of Finite State Machine */
 
-
 /* Start of StreamLayer */
 var _ raft.StreamLayer = (*StreamLayer)(nil)
 
 type StreamLayer struct {
-	ln				net.Listener
-	serverTLSConfig	*tls.Config
-	peerTLSConfig	*tls.Config
+	ln              net.Listener
+	serverTLSConfig *tls.Config
+	peerTLSConfig   *tls.Config
 }
 
 func NewStreamLayer(ln net.Listener, serverTLSConfig, peerTLSConfig *tls.Config) *StreamLayer {
@@ -463,4 +462,5 @@ func (s *StreamLayer) Close() error {
 func (s *StreamLayer) Addr() net.Addr {
 	return s.ln.Addr()
 }
+
 /* End of StreamLayer */

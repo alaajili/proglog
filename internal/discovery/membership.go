@@ -10,10 +10,10 @@ import (
 
 type Membership struct {
 	Config
-	handler	Handler
-	serf	*serf.Serf
-	events	chan serf.Event
-	logger	*zap.Logger
+	handler Handler
+	serf    *serf.Serf
+	events  chan serf.Event
+	logger  *zap.Logger
 }
 
 func New(handler Handler, config Config) (*Membership, error) {
@@ -29,10 +29,10 @@ func New(handler Handler, config Config) (*Membership, error) {
 }
 
 type Config struct {
-	NodeName		string
-	BindAddr		string
-	Tags			map[string]string
-	StartJoinAddrs	[]string
+	NodeName       string
+	BindAddr       string
+	Tags           map[string]string
+	StartJoinAddrs []string
 }
 
 func (m *Membership) setupSerf() error {
@@ -55,7 +55,7 @@ func (m *Membership) setupSerf() error {
 	}
 
 	go m.eventHandler()
-	
+
 	if m.StartJoinAddrs != nil {
 		_, err := m.serf.Join(m.StartJoinAddrs, true)
 		if err != nil {

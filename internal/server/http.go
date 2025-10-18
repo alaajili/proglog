@@ -7,8 +7,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/* 	NewHttpServer creates a new HTTP server with the given address.
-	It sets up the routes for producing and consuming records.
+/*
+	 	NewHttpServer creates a new HTTP server with the given address.
+		It sets up the routes for producing and consuming records.
 */
 func NewHttpServer(addr string) *http.Server {
 	httpServer := newHttpServer()
@@ -16,7 +17,7 @@ func NewHttpServer(addr string) *http.Server {
 	r.HandleFunc("/", httpServer.handleProduce).Methods("POST")
 	r.HandleFunc("/", httpServer.handleConsume).Methods("GET")
 	return &http.Server{
-		Addr:	 addr,
+		Addr:    addr,
 		Handler: r,
 	}
 }
@@ -47,7 +48,6 @@ type ConsumeRequest struct {
 type ConsumeResponse struct {
 	Record Record `json:"record"`
 }
-
 
 /* 	methos for handling produce and consume requests. */
 func (s *httpServer) handleProduce(w http.ResponseWriter, r *http.Request) {

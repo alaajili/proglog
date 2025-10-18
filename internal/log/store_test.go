@@ -34,7 +34,7 @@ func testAppend(t *testing.T, s *store) {
 	for i := uint64(1); i < 4; i++ {
 		n, pos, err := s.Append(write)
 		require.NoError(t, err)
-		require.Equal(t, pos+ n, width*i)
+		require.Equal(t, pos+n, width*i)
 		require.Equal(t, n, width)
 	}
 }
@@ -73,7 +73,7 @@ func TestStoreClose(t *testing.T) {
 	f, err := os.CreateTemp("", "store_close_test")
 	require.NoError(t, err)
 	defer func() { _ = os.Remove(f.Name()) }()
-	
+
 	s, err := newStore(f)
 	require.NoError(t, err)
 
@@ -100,11 +100,11 @@ func openFile(name string) (*os.File, int64, error) {
 	if err != nil {
 		return nil, 0, err
 	}
-	
+
 	fi, err := f.Stat()
 	if err != nil {
 		return nil, 0, err
 	}
-	
+
 	return f, fi.Size(), nil
 }

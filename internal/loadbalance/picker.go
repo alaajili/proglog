@@ -11,11 +11,11 @@ import (
 
 var _ base.PickerBuilder = (*Picker)(nil)
 
-type Picker struct{
-	mu			sync.RWMutex
-	leader		balancer.SubConn
-	followers	[]balancer.SubConn
-	current		uint64
+type Picker struct {
+	mu        sync.RWMutex
+	leader    balancer.SubConn
+	followers []balancer.SubConn
+	current   uint64
 }
 
 func (p *Picker) Build(info base.PickerBuildInfo) balancer.Picker {

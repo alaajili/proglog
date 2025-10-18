@@ -14,11 +14,11 @@ import (
 )
 
 type Resolver struct {
-	mu				sync.Mutex
-	clientConn		resolver.ClientConn
-	resolverConn	*grpc.ClientConn
-	serviceConfig	*serviceconfig.ParseResult
-	logger			*zap.Logger
+	mu            sync.Mutex
+	clientConn    resolver.ClientConn
+	resolverConn  *grpc.ClientConn
+	serviceConfig *serviceconfig.ParseResult
+	logger        *zap.Logger
 }
 
 // START: resolver_builder
@@ -56,6 +56,7 @@ func (r *Resolver) Scheme() string {
 func init() {
 	resolver.Register(&Resolver{})
 }
+
 // END: resolver_builder
 
 // START: resolver_resolver
@@ -76,7 +77,7 @@ func (r *Resolver) ResolveNow(resolver.ResolveNowOptions) {
 	var addrs []resolver.Address
 	for _, server := range res.Servers {
 		addrs = append(addrs, resolver.Address{
-			Addr:	server.RpcAddr,
+			Addr: server.RpcAddr,
 			Attributes: attributes.New(
 				"is_leader",
 				server.IsLeader,
@@ -84,8 +85,8 @@ func (r *Resolver) ResolveNow(resolver.ResolveNowOptions) {
 		})
 	}
 	_ = r.clientConn.UpdateState(resolver.State{
-		Addresses:		addrs,
-		ServiceConfig:	r.serviceConfig,
+		Addresses:     addrs,
+		ServiceConfig: r.serviceConfig,
 	})
 }
 

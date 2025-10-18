@@ -10,11 +10,11 @@ import (
 )
 
 type segment struct {
-	store		*store
-	index		*index
-	baseOffset	uint64
-	nextOffset	uint64
-	config		Config
+	store      *store
+	index      *index
+	baseOffset uint64
+	nextOffset uint64
+	config     Config
 }
 
 func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
@@ -47,7 +47,7 @@ func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
 	if s.index, err = newIndex(indexFile, c); err != nil {
 		return nil, err
 	}
-	
+
 	if off, _, err := s.index.Read(-1); err != nil {
 		s.nextOffset = baseOffset
 	} else {
@@ -64,15 +64,15 @@ func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 	if err != nil {
 		return 0, err
 	}
-	
+
 	_, pos, err := s.store.Append(p)
 	if err != nil {
 		return 0, err
 	}
-	
+
 	if err = s.index.Write(
 		// index offsets are relative to base offset
-		uint32(s.nextOffset - s.baseOffset),
+		uint32(s.nextOffset-s.baseOffset),
 		pos,
 	); err != nil {
 		return 0, err
@@ -87,12 +87,12 @@ func (s *segment) Read(offset uint64) (*api.Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	p, err := s.store.Read(pos)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	record := &api.Record{}
 	err = proto.Unmarshal(p, record)
 	return record, err
@@ -100,7 +100,7 @@ func (s *segment) Read(offset uint64) (*api.Record, error) {
 
 func (s *segment) IsMaxed() bool {
 	return s.store.size >= s.config.Segment.MaxStoreBytes ||
-			s.index.size >= s.config.Segment.MaxIndexBytes
+		s.index.size >= s.config.Segment.MaxIndexBytes
 }
 
 func (s *segment) Remove() error {

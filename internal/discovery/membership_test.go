@@ -17,17 +17,17 @@ func TestMembership(t *testing.T) {
 
 	require.Eventually(t, func() bool {
 		return len(handler.joins) == 2 &&
-				len(m[0].Members()) == 3 &&
-				len(handler.leaves) == 0
+			len(m[0].Members()) == 3 &&
+			len(handler.leaves) == 0
 	}, 3*time.Second, 250*time.Millisecond)
 
 	require.NoError(t, m[2].Leave())
 
 	require.Eventually(t, func() bool {
 		return len(handler.joins) == 2 &&
-				len(m[0].Members()) == 3 &&
-				m[0].Members()[2].Status == serf.StatusLeft &&
-				len(handler.leaves) == 1
+			len(m[0].Members()) == 3 &&
+			m[0].Members()[2].Status == serf.StatusLeft &&
+			len(handler.leaves) == 1
 	}, 3*time.Second, 250*time.Millisecond)
 
 	require.Equal(t, fmt.Sprintf("%d", 2), <-handler.leaves)
@@ -61,8 +61,8 @@ func setupMember(t *testing.T, members []*Membership) (
 }
 
 type handler struct {
-	joins	chan map[string]string
-	leaves	chan string
+	joins  chan map[string]string
+	leaves chan string
 }
 
 func (h *handler) Join(id, addr string) error {

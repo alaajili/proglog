@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func New(model,  policy string) *Authorizer	{
+func New(model, policy string) *Authorizer {
 	enforcer := casbin.NewEnforcer(model, policy)
 	return &Authorizer{
 		enforcer: enforcer,

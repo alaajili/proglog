@@ -23,7 +23,7 @@ func TestMultipleNodes(t *testing.T) {
 	for i := range nodeCount {
 		dataDir, err := os.MkdirTemp("", "distributed-log-test")
 		require.NoError(t, err)
-		
+
 		defer func(dir string) {
 			_ = os.RemoveAll(dir)
 		}(dataDir)
@@ -45,7 +45,7 @@ func TestMultipleNodes(t *testing.T) {
 		if i == 0 {
 			config.Raft.Bootstrap = true
 		}
-		
+
 		l, err := log.NewDistributedLog(dataDir, config)
 		require.NoError(t, err)
 
@@ -105,7 +105,7 @@ func TestMultipleNodes(t *testing.T) {
 
 	err = logs[0].Leave("1")
 	require.NoError(t, err)
-	
+
 	time.Sleep(50 * time.Millisecond)
 
 	off, err := logs[0].Append(&api.Record{Value: []byte("third")})

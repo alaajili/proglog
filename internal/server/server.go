@@ -25,18 +25,16 @@ import (
 
 /* START: types */
 type Config struct {
-	CommitLog	CommitLog
-	Authorizer	Authorizer
-	GetServerer	GetServerer
+	CommitLog   CommitLog
+	Authorizer  Authorizer
+	GetServerer GetServerer
 }
 
 const (
 	objectWildcard = "*"
-	produceAction = "produce"
-	consumeAction = "consume"
+	produceAction  = "produce"
+	consumeAction  = "consume"
 )
-
-
 
 var _ api.LogServer = (*grpcServer)(nil)
 
@@ -86,10 +84,10 @@ func NewGRPCServer(config *Config, opts ...grpc.ServerOption) (
 			grpc_zap.StreamServerInterceptor(logger, zapOpts...),
 			grpc_auth.StreamServerInterceptor(authenticate),
 		)), grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			grpc_ctxtags.UnaryServerInterceptor(),
-			grpc_zap.UnaryServerInterceptor(logger, zapOpts...),
-			grpc_auth.UnaryServerInterceptor(authenticate),
-		),
+		grpc_ctxtags.UnaryServerInterceptor(),
+		grpc_zap.UnaryServerInterceptor(logger, zapOpts...),
+		grpc_auth.UnaryServerInterceptor(authenticate),
+	),
 	), grpc.StatsHandler(&ocgrpc.ServerHandler{}))
 	gsrv := grpc.NewServer(opts...)
 	srv, err := newgrpcServer(config)
@@ -177,6 +175,7 @@ func (s *grpcServer) ConsumeStream(req *api.ConsumeRequest, stream api.Log_Consu
 		}
 	}
 }
+
 /* END: ProduceStream and ConsumeStream */
 
 /* START: GetServers */

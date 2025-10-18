@@ -43,9 +43,9 @@ func TestServer(t *testing.T) {
 		config *Config,
 	){
 		"produce/consume a message to/from the log succeeds": testProduceConsume,
-		"produce/consume stream succeeds":					  testProduceConsumeStream,
-		"consume past log boundary fails":					  testConsumePastBoundary,
-		"unauthorized fails":								  testUnauthorized,
+		"produce/consume stream succeeds":                    testProduceConsumeStream,
+		"consume past log boundary fails":                    testConsumePastBoundary,
+		"unauthorized fails":                                 testUnauthorized,
 	} {
 		t.Run(scenario, func(t *testing.T) {
 			rootClient, nobodyClient, config, teardown := setupTest(t, nil)
@@ -102,21 +102,21 @@ func setupTest(t *testing.T, fn func(*Config)) (
 	// END: multiple clients
 
 	serverTLSConfig, err := config.SetupTLSConfig(config.TLSConfig{
-		CertFile:		config.ServerCertFile,
-		KeyFile:		config.ServerKeyFile,
-		CAFile:			config.CAFile,
-		ServerAddress:	l.Addr().String(),
-		Server:			true,
+		CertFile:      config.ServerCertFile,
+		KeyFile:       config.ServerKeyFile,
+		CAFile:        config.CAFile,
+		ServerAddress: l.Addr().String(),
+		Server:        true,
 	})
 	require.NoError(t, err)
-	
+
 	serverCreds := credentials.NewTLS(serverTLSConfig)
 	dir, err := os.MkdirTemp("", "server-test")
 	require.NoError(t, err)
 
 	clog, err := log.NewLog(dir, log.Config{})
 	require.NoError(t, err)
-	
+
 	authorizer := auth.New(config.ACLModelFile, config.ACLPolicyFile)
 
 	// START: telemetry
@@ -129,12 +129,12 @@ func setupTest(t *testing.T, fn func(*Config)) (
 		tracesLogFile, err := os.CreateTemp("", "traces-*.log")
 		require.NoError(t, err)
 		t.Logf("traces log file: %s", tracesLogFile.Name())
-		
+
 		telemetryExporter, err = exporter.NewLogExporter(
 			exporter.Options{
-				MetricsLogFile:		metricesLogFile.Name(),
-				TracesLogFile:		tracesLogFile.Name(),
-				ReportingInterval:	time.Second,
+				MetricsLogFile:    metricesLogFile.Name(),
+				TracesLogFile:     tracesLogFile.Name(),
+				ReportingInterval: time.Second,
 			},
 		)
 		require.NoError(t, err)
@@ -145,8 +145,8 @@ func setupTest(t *testing.T, fn func(*Config)) (
 	// END: telemetry
 
 	cfg = &Config{
-		CommitLog:	clog,
-		Authorizer:	authorizer,
+		CommitLog:  clog,
+		Authorizer: authorizer,
 	}
 	if fn != nil {
 		fn(cfg)
@@ -154,7 +154,7 @@ func setupTest(t *testing.T, fn func(*Config)) (
 
 	server, err := NewGRPCServer(cfg, grpc.Creds(serverCreds))
 	require.NoError(t, err)
-	
+
 	go func() {
 		_ = server.Serve(l)
 	}()
@@ -263,7 +263,7 @@ func testUnauthorized(
 	config *Config,
 ) {
 	ctx := context.Background()
-	
+
 	produce, err := client.Produce(ctx, &api.ProduceRequest{
 		Record: &api.Record{Value: []byte("hello world")},
 	})
